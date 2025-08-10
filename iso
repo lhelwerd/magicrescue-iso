@@ -1,0 +1,14 @@
+# magicrescue recipe to extract ISO files.
+# The first 32768 bytes of an ISO are part of the System Area, which is usually
+# empty or otherwise gibberish. We cannot use it to detect the file, but it
+# needs to be a part of the output, thus we have a large search offset which
+# likely hinders the rescue. Thus only use this on data/device sources that can
+# be easily searched, i.e., never run this on a corrupt disk itself.
+# The additional byte in comparison to 32768 is to find the Identifier of the
+# first volume descriptor. This is always "CD001" for ISO files. The volume
+# descriptor Version, which is one byte after those five bytes, is always 0x01.
+32769 string CD001
+32774 char \x01
+extension iso
+# Offload further analysis and extraction into a file to the python script.
+command python iso.py - "$1"
